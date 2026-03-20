@@ -3,23 +3,127 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Core backgrounds */
+    --base: 4 6 12;
+    --base-elevated: 8 10 18;
+    --surface: 10 13 24;
+    --surface-2: 14 18 30;
+    --elevated: 18 22 36;
+
+    /* Text */
+    --text-primary: 242 244 250;
+    --text-secondary: 176 181 194;
+    --text-muted: 112 119 138;
+
+    /* Borders */
+    --border: 33 39 58;
+    --border-subtle: 23 28 44;
+
+    /* Brand */
+    --gold: 132 186 146;
+    --gold-dim: 109 159 124;
+    --gold-muted: 132 186 146 / 0.12;
+
+    /* Accent status */
+    --success: 74 222 128;
+    --danger: 248 113 113;
+    --warning: 250 204 21;
+  }
+
   * {
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
   }
 
   html,
   body {
-    background-color: #07070A;
-    color: #F0F0F0;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(132, 186, 146, 0.05), transparent 22%),
+      linear-gradient(180deg, #070910 0%, #05070d 45%, #03050a 100%);
+    color: rgb(var(--text-primary));
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     overscroll-behavior: none;
   }
 
-  /* Scrollbar */
+  body {
+    letter-spacing: -0.012em;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    color: inherit;
+    background: none;
+    border: 0;
+  }
+
   ::-webkit-scrollbar {
-    width: 0px;
+    width: 0;
+    height: 0;
+  }
+}
+
+@layer components {
+  .app-shell {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 50% 8%, rgba(132, 186, 146, 0.045), transparent 18%),
+      linear-gradient(180deg, #070910 0%, #05070d 45%, #03050a 100%);
+  }
+
+  .glass-card {
+    background: linear-gradient(
+      180deg,
+      rgba(12, 15, 28, 0.98) 0%,
+      rgba(9, 12, 22, 0.98) 100%
+    );
+    border: 1px solid rgba(36, 42, 64, 0.95);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.015) inset;
+  }
+
+  .soft-panel {
+    background: linear-gradient(
+      180deg,
+      rgba(13, 16, 29, 0.98) 0%,
+      rgba(9, 12, 22, 0.98) 100%
+    );
+    border: 1px solid rgba(36, 42, 64, 0.95);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.012) inset;
+  }
+
+  .premium-button {
+    background: linear-gradient(180deg, #7fb08a 0%, #75a882 100%);
+    color: #08110b;
+    box-shadow: none;
+  }
+
+  .premium-button:disabled {
+    background: #2b3342;
+    color: rgba(240, 240, 245, 0.5);
+    box-shadow: none;
+  }
+
+  .subtle-pill {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(52, 58, 82, 0.95);
+    color: rgb(var(--text-secondary));
   }
 }
 
@@ -28,7 +132,70 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .bg-base {
+    background-color: rgb(var(--base));
+  }
+
+  .bg-surface {
+    background-color: rgb(var(--surface));
+  }
+
+  .bg-elevated {
+    background-color: rgb(var(--elevated));
+  }
+
+  .text-text-primary {
+    color: rgb(var(--text-primary));
+  }
+
+  .text-text-secondary {
+    color: rgb(var(--text-secondary));
+  }
+
+  .text-text-muted {
+    color: rgb(var(--text-muted));
+  }
+
+  .border-border {
+    border-color: rgb(var(--border));
+  }
+
+  .border-border-subtle {
+    border-color: rgb(var(--border-subtle));
+  }
+
+  .text-gold {
+    color: rgb(var(--gold));
+  }
+
+  .bg-gold {
+    background-color: rgb(var(--gold));
+  }
+
+  .from-gold-dim {
+    --tw-gradient-from: rgb(var(--gold-dim)) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(var(--gold-dim) / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
+
+  .to-gold {
+    --tw-gradient-to: rgb(var(--gold)) var(--tw-gradient-to-position);
+  }
+
+  .bg-gold-muted {
+    background-color: rgba(132, 186, 146, 0.12);
+  }
+
+  .app-glow {
+    position: relative;
+  }
+
+  .app-glow::before {
+    content: none;
   }
 }

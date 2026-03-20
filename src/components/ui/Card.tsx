@@ -12,12 +12,13 @@ export default function Card({
   children,
   ...props
 }: CardProps) {
-  const base = 'rounded-2xl overflow-hidden';
-  const bg = elevated ? 'bg-elevated' : 'bg-surface';
-  const border = bordered ? 'border border-border' : '';
+  const base =
+    'rounded-[28px] overflow-hidden transition-all duration-200';
+  const surface = elevated ? 'soft-panel' : 'glass-card';
+  const border = bordered ? '' : 'border-0';
 
   return (
-    <div className={`${base} ${bg} ${border} ${className}`} {...props}>
+    <div className={`${base} ${surface} ${border} ${className}`} {...props}>
       {children}
     </div>
   );

@@ -3,17 +3,40 @@ import { User } from '../types';
 export const mockUser: User = {
   name: 'Alex',
   rank: 'Rise',
-  edgePoints: 1240,
-  run: 7,
-  topPercent: 23,
-  rankProgress: 62, // 62% to next rank
-  edgePointsToNextRank: 760,
+  edgePoints: 0,
+  run: 0,
+  topPercent: 50,
+  rankProgress: 0,
+  edgePointsToNextRank: 100,
 };
 
 export const leaderboard = [
-  { rank: 1, name: 'Marcus H.', edgePoints: 4820, userRank: 'Ascent' },
-  { rank: 2, name: 'Priya S.', edgePoints: 4310, userRank: 'Ascent' },
-  { rank: 3, name: 'Jordan K.', edgePoints: 3990, userRank: 'Ascent' },
-  { rank: 4, name: 'You', edgePoints: 1240, userRank: 'Rise', isCurrentUser: true },
-  { rank: 5, name: 'Chris M.', edgePoints: 1180, userRank: 'Rise' },
+  {
+    name: 'Marcus H.',
+    confidenceScore: 3,
+    maxScore: 3,
+    dailyEdgePoints: 70,
+    highConviction: true,
+  },
+  {
+    name: 'Priya S.',
+    confidenceScore: 3,
+    maxScore: 3,
+    dailyEdgePoints: 50,
+    highConviction: false,
+  },
+  {
+    name: 'Jordan K.',
+    confidenceScore: 2,
+    maxScore: 3,
+    dailyEdgePoints: 30,
+    highConviction: false,
+  },
+  {
+    name: 'Chris M.',
+    confidenceScore: 1,
+    maxScore: 3,
+    dailyEdgePoints: 10,
+    highConviction: false,
+  },
 ];

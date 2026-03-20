@@ -13,18 +13,19 @@ export default function Button({
   className = '',
   children,
   disabled,
+  type = 'button',
   ...props
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 tracking-wide select-none';
+    'inline-flex items-center justify-center rounded-2xl font-semibold tracking-[-0.01em] transition-all duration-150 select-none whitespace-nowrap';
 
   const variants = {
     primary:
-      'bg-gold text-base hover:bg-gold-bright active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed',
+      'premium-button active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50',
     secondary:
-      'bg-elevated border border-border text-text-primary hover:border-gold/40 active:scale-[0.98] disabled:opacity-40',
+      'bg-surface border border-border text-text-primary hover:bg-white/[0.02] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50',
     ghost:
-      'text-text-secondary hover:text-text-primary active:scale-[0.98] disabled:opacity-40',
+      'text-text-secondary hover:text-text-primary hover:bg-white/[0.02] active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-40',
   };
 
   const sizes = {
@@ -35,7 +36,10 @@ export default function Button({
 
   return (
     <button
-      className={`${base} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      type={type}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${
+        fullWidth ? 'w-full' : ''
+      } ${className}`}
       disabled={disabled}
       {...props}
     >

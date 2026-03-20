@@ -2,33 +2,33 @@ import { Challenge, Track } from '../types';
 
 export const tracks: Track[] = [
   {
-    id: 'valuation',
-    name: 'Valuation',
-    description: 'DCF, comps, precedent transactions',
+    id: 'macro',
+    name: 'Macro Reactions',
+    description: 'CPI, Fed, jobs, inflation, and how markets reprice them',
     challengeCount: 24,
     completedCount: 8,
-    color: '#C8A84B',
-  },
-  {
-    id: 'ma',
-    name: 'M&A',
-    description: 'Deal structures, synergies, accretion/dilution',
-    challengeCount: 18,
-    completedCount: 3,
-    color: '#6C8EBF',
-  },
-  {
-    id: 'markets',
-    name: 'Markets',
-    description: 'Equities, fixed income, derivatives',
-    challengeCount: 30,
-    completedCount: 12,
     color: '#7BB38A',
   },
   {
+    id: 'earnings',
+    name: 'Earnings Reads',
+    description: 'Beats, misses, guidance, and when good news still sells off',
+    challengeCount: 18,
+    completedCount: 3,
+    color: '#C8A84B',
+  },
+  {
+    id: 'momentum',
+    name: 'Momentum',
+    description: 'Rallies, reversals, gap-ups, and crowd positioning',
+    challengeCount: 30,
+    completedCount: 12,
+    color: '#6C8EBF',
+  },
+  {
     id: 'risk',
-    name: 'Risk',
-    description: 'Credit risk, VaR, stress testing',
+    name: 'Risk Events',
+    description: 'Oil shocks, rate spikes, volatility, and defensive rotations',
     challengeCount: 16,
     completedCount: 0,
     color: '#B87B6C',
@@ -38,107 +38,422 @@ export const tracks: Track[] = [
 export const challenges: Challenge[] = [
   {
     id: 'ch-001',
-    title: 'LBO Exit Multiple Compression',
-    track: 'Valuation',
+    title: 'Cool CPI, Crowded Longs',
+    track: 'Macro Reactions',
     difficulty: 'Associate',
-    timeEstimate: '3 min',
-    scenario:
-      'A private equity firm acquired a mid-market industrial manufacturer at an 8.0x EV/EBITDA entry multiple. At acquisition, the company generated $20M in EBITDA. Over a 5-year hold period, the team grew EBITDA to $35M through operational improvements and geographic expansion.\n\nHowever, rising rates and sector rotation compressed transaction multiples. Comparable deals now clear at 6.0x EV/EBITDA. Assuming the exit occurs at the current market multiple, what is the implied change in enterprise value from entry to exit?',
-    options: [
-      {
-        id: 'a',
-        label: 'A',
-        text: 'Enterprise value increased by approximately $50M',
-      },
-      {
-        id: 'b',
-        label: 'B',
-        text: 'Enterprise value decreased — multiple compression fully erased EBITDA growth',
-      },
-      {
-        id: 'c',
-        label: 'C',
-        text: 'Enterprise value is unchanged — EBITDA growth exactly offset compression',
-      },
-      {
-        id: 'd',
-        label: 'D',
-        text: 'Enterprise value increased by approximately $120M from EBITDA growth alone',
-      },
-    ],
-    correctOptionId: 'a',
-    explanation:
-      'Entry EV: 8.0x × $20M = $160M\nExit EV: 6.0x × $35M = $210M\nNet change: +$50M\n\nDespite a 25% compression in multiples (8x → 6x), the 75% EBITDA growth ($20M → $35M) more than offset it. This is a core PE insight: EBITDA growth is the most durable value driver in an LBO. Operational improvement can overcome significant market multiple deterioration — but not always. The math always tells the story.',
-    edgePoints: 75,
-  },
-  {
-    id: 'ch-002',
-    title: 'Dilution in a Stock-for-Stock Merger',
-    track: 'M&A',
-    difficulty: 'Analyst',
     timeEstimate: '2 min',
     scenario:
-      'Acquirer Corp has 100M diluted shares outstanding and earns $200M in net income ($2.00 EPS). It is acquiring Target Inc. in an all-stock deal — Target shareholders receive 20M newly issued Acquirer shares.\n\nTarget contributes $30M in net income to the combined entity. No synergies are assumed. What is the pro-forma EPS of the combined company, and is the deal accretive or dilutive?',
+      'CPI comes in cooler than expected, which is normally bullish for equities. But the S&P 500 has already rallied hard for two weeks and positioning is heavily skewed long into the print.\n\nWhat is the best read on the most likely next move?',
     options: [
       {
         id: 'a',
         label: 'A',
-        text: '$1.92 EPS — dilutive by $0.08 per share',
+        text: 'The market likely extends higher because cool CPI is always bullish',
       },
       {
         id: 'b',
         label: 'B',
-        text: '$2.08 EPS — accretive by $0.08 per share',
+        text: 'The market could still fade because good news may already be priced in',
       },
       {
         id: 'c',
         label: 'C',
-        text: '$1.83 EPS — dilutive by $0.17 per share',
+        text: 'The CPI number should not matter once the opening bell rings',
       },
       {
         id: 'd',
         label: 'D',
-        text: '$2.00 EPS — neutral, no change',
-      },
-    ],
-    correctOptionId: 'a',
-    explanation:
-      'Combined net income: $200M + $30M = $230M\nPro-forma shares: 100M + 20M = 120M\nPro-forma EPS: $230M ÷ 120M ≈ $1.92\n\nThe deal is dilutive by ~$0.08. While Target adds earnings (+15%), the share issuance grows the count by 20%. When share count grows faster than earnings, EPS falls.\n\nCore rule: a stock deal is accretive only when the target\'s implied P/E is lower than the acquirer\'s P/E. Always run the EPS math before the announcement.',
-    edgePoints: 50,
-  },
-  {
-    id: 'ch-003',
-    title: 'Duration and Interest Rate Risk',
-    track: 'Markets',
-    difficulty: 'Analyst',
-    timeEstimate: '2 min',
-    scenario:
-      'A portfolio manager holds two bonds with identical credit quality and 5% annual coupons. Bond A matures in 2 years; Bond B matures in 10 years. Both are currently priced at par ($1,000).\n\nThe central bank unexpectedly raises the policy rate by 100 basis points. Which bond experiences the larger price decline, and approximately by how much?',
-    options: [
-      {
-        id: 'a',
-        label: 'A',
-        text: 'Bond A falls more — shorter bonds are more price-sensitive',
-      },
-      {
-        id: 'b',
-        label: 'B',
-        text: 'Bond B falls more — approximately $62–$68 per $1,000 face value',
-      },
-      {
-        id: 'c',
-        label: 'C',
-        text: 'Both bonds fall by the same amount since they have identical coupons',
-      },
-      {
-        id: 'd',
-        label: 'D',
-        text: 'Bond B falls more — by exactly $100 per $1,000 face value',
+        text: 'The market must go sideways because bullish positioning cancels out inflation data',
       },
     ],
     correctOptionId: 'b',
     explanation:
-      'Bond B (10-year) has a modified duration of ~7.7 years vs Bond A\'s ~1.9 years. Price change ≈ −Duration × ΔRate, so Bond B falls ~7.7% ≈ $77, Bond A ~1.9% ≈ $19.\n\nLonger-duration bonds are exponentially more sensitive to rate moves because more cash flows are discounted at higher rates for longer periods. This is why the long end of the curve moves violently when rate expectations shift.\n\nThe $62–$68 range accounts for convexity — the actual relationship is curved, not linear.',
+      'This is an expectations game. Cooler CPI is bullish on paper, but when positioning is already leaning hard in the same direction, even good news can fail to create fresh upside. If the market cannot rally on favorable data, that can lead to a fade.',
+    edgePoints: 50,
+  },
+  {
+    id: 'ch-002',
+    title: 'Hot Jobs, Bad for Stocks?',
+    track: 'Macro Reactions',
+    difficulty: 'Analyst',
+    timeEstimate: '2 min',
+    scenario:
+      'A jobs report comes in much stronger than expected. Wage growth is firm, unemployment stays low, and traders had been hoping for softer data to support future rate cuts.\n\nWhy might stocks trade lower on what looks like good economic news?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Because strong labor data can keep rates higher for longer',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Because good economic news is always bad for company earnings',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Because employment data only matters for bonds, not stocks',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Because traders ignore jobs reports if inflation is stable',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Markets often care more about the policy implication than the headline itself. If traders were looking for softer growth to support easier policy, a hot jobs report can push yields higher and weigh on equities.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-003',
+    title: 'Beat, but Lower Guide',
+    track: 'Earnings Reads',
+    difficulty: 'Analyst',
+    timeEstimate: '2 min',
+    scenario:
+      'A company beats revenue and EPS for the quarter, but management lowers full-year guidance and sounds more cautious on the call.\n\nWhat is the best explanation for why the stock could still sell off?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Because markets discount future expectations more than past results',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Because earnings beats automatically trigger profit-taking',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Because investors only care about revenue and not guidance',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Because after-hours reactions are always reversed the next day',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'A stock is valued on future expectations, not just the last quarter. A solid quarter with weaker forward guidance can still lead to a selloff because the market cares more about what happens next.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-004',
+    title: 'Good Quarter, No Pop',
+    track: 'Earnings Reads',
+    difficulty: 'Associate',
+    timeEstimate: '2 min',
+    scenario:
+      'A mega-cap tech company beats earnings, margins are solid, and guidance is fine. But the stock barely moves after hours.\n\nWhat is the sharpest interpretation of that muted reaction?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'The report was likely already close to what the market had priced in',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'After-hours price action is meaningless for real investors',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'The company must have hidden terrible numbers in the release',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'A beat guarantees upside, so the market is clearly wrong',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Price reaction is often more revealing than the headline. If a stock cannot move up on objectively solid news, it can mean expectations were already elevated and the upside was priced in.',
+    edgePoints: 50,
+  },
+  {
+    id: 'ch-005',
+    title: 'Bad Numbers, Stock Up',
+    track: 'Earnings Reads',
+    difficulty: 'Associate',
+    timeEstimate: '2 min',
+    scenario:
+      'A company reports weak earnings, but the stock rises the next morning.\n\nWhich explanation is usually the most market-savvy read?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'The market expected something even worse, so the report was a relief',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Stocks usually go up after bad quarters because investors buy the dip',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Weak earnings do not matter if the company has a famous CEO',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'The stock market often ignores company fundamentals entirely',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Markets move against expectations, not headlines alone. If sentiment was very negative and the report came in less bad than feared, the reaction can still be bullish.',
+    edgePoints: 50,
+  },
+  {
+    id: 'ch-006',
+    title: 'Gap Up, Then What?',
+    track: 'Momentum',
+    difficulty: 'Analyst',
+    timeEstimate: '2 min',
+    scenario:
+      'The S&P 500 gaps up 2% at the open on strong overnight news. Early traders now have to decide whether to chase the move or expect it to fade.\n\nWhat matters most in judging whether the gap is real?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Whether buyers continue to support the move after the open',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'The opening price, because it usually determines the close',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Whether the previous day closed green or red',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Whether dividend yields are rising during the session',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'A strong open is not enough. Traders watch follow-through. If buyers cannot keep supporting price after the initial gap, profit-taking can quickly turn a bullish-looking open into a fade.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-007',
+    title: 'Extended Rally Risk',
+    track: 'Momentum',
+    difficulty: 'Analyst',
+    timeEstimate: '2 min',
+    scenario:
+      'A stock has rallied for six straight sessions and sentiment is turning euphoric.\n\nWhy does that often make the next long entry less attractive?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Because the reward-to-risk usually gets worse after an extended move',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Because stocks are required to reverse after six green days',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Because momentum stops working once sentiment turns positive',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Because volume no longer matters after a multi-day rally',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'The problem is not that the stock cannot go higher. It is that chasing after a big move often means weaker upside relative to downside, especially if positioning is getting crowded and profit-taking risk is rising.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-008',
+    title: 'Panic Selloff or Opportunity?',
+    track: 'Momentum',
+    difficulty: 'Associate',
+    timeEstimate: '2 min',
+    scenario:
+      'The market drops hard on heavy volume and sentiment turns fearful fast.\n\nBefore calling a bounce, what is the most important question to ask?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Was this true capitulation or just the start of a larger unwind?',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Did the market fall enough to satisfy technical traders?',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Did a commentator on financial TV say the bottom was in?',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Was the decline larger than the last decline?',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Fast selloffs can create opportunities, but only if the move reflects panic exhaustion rather than the early stage of deeper liquidation. Volume, reaction quality, and follow-through all matter.',
+    edgePoints: 50,
+  },
+  {
+    id: 'ch-009',
+    title: 'Rate Spike and Growth Stocks',
+    track: 'Risk Events',
+    difficulty: 'Analyst',
+    timeEstimate: '2 min',
+    scenario:
+      'The 10-year yield jumps sharply in one session and growth stocks had been leading the market beforehand.\n\nWhy are long-duration growth stocks especially vulnerable here?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Because more of their value depends on future cash flows being discounted at higher rates',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Because yields only matter for banks and insurance stocks',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Because growth companies are legally required to underperform when rates rise',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Because growth stocks do not generate real earnings',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Long-duration equities are sensitive to discount-rate changes because a larger share of their valuation comes from future earnings. When yields jump fast, that pressure tends to show up quickly in growth-heavy names.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-010',
+    title: 'Oil Shock and Airlines',
+    track: 'Risk Events',
+    difficulty: 'Easy',
+    timeEstimate: '1 min',
+    scenario:
+      'Oil spikes 10% overnight after geopolitical tension. Which sector is most directly pressured first?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Airlines, because fuel costs can quickly pressure margins',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Utilities, because lower fuel prices help their margins immediately',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Software, because cloud demand depends directly on crude prices',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Treasuries, because oil spikes mechanically force bond prices higher',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Airlines are often hit quickly when oil spikes because fuel is a major operating cost and margin sensitivity is high.',
+    edgePoints: 30,
+  },
+  {
+    id: 'ch-011',
+    title: 'Rising Volatility, No Clear Trend',
+    track: 'Risk Events',
+    difficulty: 'Associate',
+    timeEstimate: '2 min',
+    scenario:
+      'Volatility is rising, but the market is chopping sideways instead of breaking cleanly higher or lower.\n\nWhat is the best read on that type of environment?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'It often reflects uncertainty, weak conviction, and fragile positioning',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'It means the next move must be strongly bullish',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'It means volatility is no longer useful information',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'It proves macro data has stopped mattering',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'Higher volatility without a clean trend often signals unstable positioning and uncertainty rather than clarity. That kind of tape can be fragile and prone to sharp reactions once a catalyst finally lands.',
+    edgePoints: 40,
+  },
+  {
+    id: 'ch-012',
+    title: 'Soft Data, Relief Rally',
+    track: 'Macro Reactions',
+    difficulty: 'Associate',
+    timeEstimate: '2 min',
+    scenario:
+      'A jobs report misses expectations, but not badly enough to trigger full recession panic. Traders had been wanting softer data to improve the rate outlook.\n\nWhat is the smartest read on why stocks could rally?',
+    options: [
+      {
+        id: 'a',
+        label: 'A',
+        text: 'Because softer data can ease rate pressure without immediately implying collapse',
+      },
+      {
+        id: 'b',
+        label: 'B',
+        text: 'Because weak data is always bullish for every part of the market',
+      },
+      {
+        id: 'c',
+        label: 'C',
+        text: 'Because the Fed is required to cut rates after any economic miss',
+      },
+      {
+        id: 'd',
+        label: 'D',
+        text: 'Because recession risk never matters when inflation is falling',
+      },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'This is the soft-landing sweet spot traders often like. Growth cools enough to help the rate picture, but not so much that the market immediately has to price a deep economic downturn.',
     edgePoints: 50,
   },
 ];
