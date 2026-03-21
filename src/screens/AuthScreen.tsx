@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Mail, Lock, User } from 'lucide-react';
+import { BarChart3, Mail, Lock, User, CheckCircle2 } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
@@ -51,8 +51,7 @@ export default function AuthScreen() {
       }
     } catch (error) {
       console.error('Auth error:', error);
-
-        const message =
+      const message =
         error instanceof Error ? error.message : 'Something went wrong';
       setErrorText(message);
     } finally {
@@ -74,7 +73,9 @@ export default function AuthScreen() {
             </h1>
 
             <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-              Sign in to save your streak, Edge Points, and daily calls.
+              {mode === 'sign-in'
+                ? 'Sign in to keep your streak, Edge Points, Daily Call history, and practice progress.'
+                : 'Create your account to start building finance judgment, one sharp rep at a time.'}
             </p>
           </div>
 
@@ -82,7 +83,11 @@ export default function AuthScreen() {
             <div className="mb-5 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setMode('sign-in')}
+                onClick={() => {
+                  setMode('sign-in');
+                  setMessage('');
+                  setErrorText('');
+                }}
                 className={`rounded-[18px] border px-4 py-3 text-sm font-semibold transition-all ${
                   mode === 'sign-in'
                     ? 'border-gold/40 bg-gold-muted text-gold'
@@ -94,7 +99,11 @@ export default function AuthScreen() {
 
               <button
                 type="button"
-                onClick={() => setMode('sign-up')}
+                onClick={() => {
+                  setMode('sign-up');
+                  setMessage('');
+                  setErrorText('');
+                }}
                 className={`rounded-[18px] border px-4 py-3 text-sm font-semibold transition-all ${
                   mode === 'sign-up'
                     ? 'border-gold/40 bg-gold-muted text-gold'
@@ -104,6 +113,40 @@ export default function AuthScreen() {
                 Create Account
               </button>
             </div>
+
+            {mode === 'sign-up' && (
+              <div className="mb-5 rounded-[20px] border border-white/[0.06] bg-white/[0.02] p-4">
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-text-muted">
+                  What you unlock
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 text-sm text-text-secondary">
+                    <CheckCircle2
+                      size={15}
+                      className="mt-0.5 flex-shrink-0 text-green-400"
+                    />
+                    <span>Save your Daily Call streak and rank progress.</span>
+                  </div>
+
+                  <div className="flex items-start gap-2 text-sm text-text-secondary">
+                    <CheckCircle2
+                      size={15}
+                      className="mt-0.5 flex-shrink-0 text-green-400"
+                    />
+                    <span>Track Edge Points and practice completion over time.</span>
+                  </div>
+
+                  <div className="flex items-start gap-2 text-sm text-text-secondary">
+                    <CheckCircle2
+                      size={15}
+                      className="mt-0.5 flex-shrink-0 text-green-400"
+                    />
+                    <span>Build a stronger read through daily reps and training paths.</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'sign-up' && (
@@ -118,6 +161,8 @@ export default function AuthScreen() {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
                       className="w-full bg-transparent text-sm text-text-primary outline-none placeholder:text-text-muted"
+                      autoComplete="name"
+                      required={mode === 'sign-up'}
                     />
                   </div>
                 </label>
@@ -151,7 +196,9 @@ export default function AuthScreen() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Your password"
+                    placeholder={
+                      mode === 'sign-up' ? 'Create a password' : 'Your password'
+                    }
                     autoComplete={
                       mode === 'sign-up' ? 'new-password' : 'current-password'
                     }

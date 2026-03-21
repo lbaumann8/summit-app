@@ -6,6 +6,8 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
+  Clock3,
+  Sparkles,
 } from 'lucide-react';
 import TopBar from '../components/layout/TopBar';
 import BottomNav from '../components/layout/BottomNav';
@@ -13,12 +15,51 @@ import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import { mockUser, leaderboard } from '../data/user';
 import { dailyChallenge } from '../data/dailyChallenge';
+import { getRecentActivity, type ActivityEntry } from '../lib/performance';
 
 const RANK_LADDER = ['Rise', 'Ascent', 'Ridge', 'Peak', 'Summit'] as const;
 const RANK_THRESHOLDS = [0, 100, 250, 500, 1000];
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function getNextDailyCallTimeLeft() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(24, 0, 0, 0);
+  return Math.max(next.getTime() - now.getTime(), 0);
+}
+
+function formatCountdown(ms: number) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
+    .toString()
+    .padStart(2, '0')}`;
+}
+
+function getRelativeTimeLabel(timestamp: number) {
+  const diffMs = Date.now() - timestamp;
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMinutes < 1) return 'Just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${diffDays}d ago`;
+}
+
+function getActivityIcon(entry: ActivityEntry) {
+  if (entry.type === 'daily_call') {
+    return <Sparkles size={14} className="text-gold" />;
+  }
+
+  return <BookOpen size={14} className="text-green-400" />;
 }
 
 function getRankData(totalEdgePoints: number) {
@@ -73,9 +114,10 @@ function getStreakRiskMessage(streakCount: number) {
   return null;
 }
 
-function getDailyCompletionBanner(todayResult: {
-  edgePointsEarned: number;
-} | null, streakCount: number) {
+function getDailyCompletionBanner(
+  todayResult: { edgePointsEarned: number } | null,
+  streakCount: number
+) {
   if (!todayResult) return null;
 
   if (streakCount > 1) {
@@ -134,6 +176,9 @@ export default function HomeScreen() {
   };
 
   const [timeLeft, setTimeLeft] = useState(getRemainingTime);
+  const [nextDailyCallTimeLeft, setNextDailyCallTimeLeft] = useState(
+    getNextDailyCallTimeLeft
+  );
   const [streakCount, setStreakCount] = useState(
     Number(localStorage.getItem('streakCount') || '0')
   );
@@ -145,10 +190,14 @@ export default function HomeScreen() {
   );
   const [completionBanner, setCompletionBanner] =
     useState<CompletionBannerState>(null);
+  const [recentActivity, setRecentActivity] = useState<ActivityEntry[]>([]);
 
   useEffect(() => {
+    setRecentActivity(getRecentActivity());
+
     const interval = setInterval(() => {
       setTimeLeft(getRemainingTime());
+      setNextDailyCallTimeLeft(getNextDailyCallTimeLeft());
       setStreakCount(Number(localStorage.getItem('streakCount') || '0'));
       setTotalEdgePoints(Number(localStorage.getItem('totalEdgePoints') || '0'));
       setLastRank(Number(localStorage.getItem('lastRank') || '0'));
@@ -179,7 +228,8 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!todayResult || !resultsReady) return;
 
-    const bannerSeen = localStorage.getItem('dailyCompletionBannerSeen') === todayKey;
+    const bannerSeen =
+      localStorage.getItem('dailyCompletionBannerSeen') === todayKey;
     if (bannerSeen) return;
 
     const banner = getDailyCompletionBanner(todayResult, streakCount);
@@ -304,6 +354,11 @@ export default function HomeScreen() {
     if (!currentUserBoardEntry?.rank) return;
     localStorage.setItem('lastRank', String(currentUserBoardEntry.rank));
   }, [currentUserBoardEntry]);
+
+  const nextDailyCallCountdown = useMemo(
+    () => formatCountdown(nextDailyCallTimeLeft),
+    [nextDailyCallTimeLeft]
+  );
 
   return (
     <div className="app-shell flex flex-col min-h-screen">
@@ -437,13 +492,85 @@ export default function HomeScreen() {
         </section>
 
         <section className="px-4 pt-5">
+          <Card className="p-5 border border-white/[0.06] bg-white/[0.02]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[11px] font-semibold tracking-wide text-text-secondary mb-3">
+                  <Clock3 size={12} />
+                  Tomorrow’s Setup
+                </div>
+
+                <h3 className="text-[22px] leading-[1.1] font-bold text-text-primary mb-2">
+                  Next Daily Call drops in {nextDailyCallCountdown}
+                </h3>
+
+                <p className="text-sm text-text-secondary leading-relaxed max-w-[94%]">
+                  Come back for a fresh market setup, protect your streak, and
+                  keep climbing the board.
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        <section className="px-4 pt-5">
+          <Card className="p-5">
+            <div className="mb-3 text-[11px] uppercase tracking-[0.18em] text-text-muted">
+              Recent Momentum
+            </div>
+
+            {recentActivity.length > 0 ? (
+              <div className="space-y-3">
+                {recentActivity.slice(0, 3).map((entry, index) => (
+                  <div
+                    key={entry.id}
+                    className={`flex items-start gap-3 ${
+                      index < Math.min(recentActivity.length, 3) - 1
+                        ? 'border-b border-white/[0.06] pb-3'
+                        : ''
+                    }`}
+                  >
+                    <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+                      {getActivityIcon(entry)}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-text-primary">
+                        {entry.title}
+                      </div>
+                      <div className="mt-1 text-sm text-text-secondary">
+                        {entry.subtitle}
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-text-muted whitespace-nowrap">
+                      {getRelativeTimeLabel(entry.createdAt)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.02] px-4 py-4">
+                <div className="text-sm font-semibold text-text-primary">
+                  No momentum yet
+                </div>
+                <div className="mt-2 text-sm leading-relaxed text-text-secondary">
+                  Finish today’s Daily Call or complete a practice session and
+                  your recent progress will show up here.
+                </div>
+              </div>
+            )}
+          </Card>
+        </section>
+
+        <section className="px-4 pt-5">
           <div className="mb-3 text-[10px] font-semibold tracking-[0.2em] text-text-muted uppercase">
             Training Mode
           </div>
 
           <Card
             className="p-5 cursor-pointer active:scale-[0.995] transition-transform"
-            onClick={() => navigate('/tracks')}
+            onClick={() => navigate('/practice')}
           >
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>

@@ -9,7 +9,6 @@ import type { Session } from '@supabase/supabase-js';
 import WelcomeScreen from './screens/WelcomeScreen';
 import HomeScreen from './screens/HomeScreen';
 import ChallengeScreen from './screens/ChallengeScreen';
-import ChallengesScreen from './screens/ChallengesScreen';
 import ResultsScreen from './screens/ResultsScreen';
 import TracksScreen from './screens/TracksScreen';
 import TrackDetailScreen from './screens/TrackDetailScreen';
@@ -56,8 +55,8 @@ export default function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
       setAuthLoading(false);
     });
 
@@ -103,6 +102,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/challenge/daily"
               element={
@@ -111,14 +111,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/challenges"
-              element={
-                <ProtectedRoute session={session}>
-                  <ChallengesScreen />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/results"
               element={
@@ -127,8 +120,9 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
             <Route
-              path="/tracks"
+              path="/practice"
               element={
                 <ProtectedRoute session={session}>
                   <TracksScreen />
@@ -136,7 +130,7 @@ export default function App() {
               }
             />
             <Route
-              path="/tracks/:trackId"
+              path="/practice/:trackId"
               element={
                 <ProtectedRoute session={session}>
                   <TrackDetailScreen />
@@ -144,13 +138,14 @@ export default function App() {
               }
             />
             <Route
-              path="/practice/:trackId"
+              path="/practice/:trackId/session"
               element={
                 <ProtectedRoute session={session}>
                   <PracticeScreen />
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/leaderboard"
               element={
@@ -174,6 +169,18 @@ export default function App() {
                   <SettingsScreen />
                 </ProtectedRoute>
               }
+            />
+
+            {/* Legacy redirects */}
+            <Route path="/challenges" element={<Navigate to="/practice" replace />} />
+            <Route path="/tracks" element={<Navigate to="/practice" replace />} />
+            <Route
+              path="/tracks/:trackId"
+              element={<Navigate to="/practice" replace />}
+            />
+            <Route
+              path="/practice-session/:trackId"
+              element={<Navigate to="/practice" replace />}
             />
 
             <Route

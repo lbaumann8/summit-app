@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, Target, Flame } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Target, Sparkles } from 'lucide-react';
 import TopBar from '../components/layout/TopBar';
 import BottomNav from '../components/layout/BottomNav';
 import Card from '../components/ui/Card';
@@ -9,6 +9,7 @@ import { tracks, challenges } from '../data/challenges';
 
 const RANK_LADDER = ['Rise', 'Ascent', 'Ridge', 'Peak', 'Summit'] as const;
 const RANK_THRESHOLDS = [0, 100, 250, 500, 1000];
+const PRACTICE_REWARD_EP = 15;
 
 function getRankData(totalEdgePoints: number) {
   let currentRankIndex = 0;
@@ -117,15 +118,15 @@ export default function TrackDetailScreen() {
         <main className="flex-1 px-4 py-6 flex items-center justify-center">
           <Card className="w-full max-w-md p-6 text-center">
             <h1 className="text-2xl font-bold text-text-primary mb-3">
-              Track not found
+              Practice path not found
             </h1>
 
             <p className="text-text-secondary text-sm mb-6">
               That practice path does not exist.
             </p>
 
-            <Button fullWidth onClick={() => navigate('/tracks')}>
-              Back to Tracks
+            <Button fullWidth onClick={() => navigate('/practice')}>
+              Back to Practice
             </Button>
           </Card>
         </main>
@@ -153,8 +154,8 @@ export default function TrackDetailScreen() {
         <div className="mb-4 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate('/tracks')}
-            aria-label="Back to tracks"
+            onClick={() => navigate('/practice')}
+            aria-label="Back to practice"
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02] text-text-primary transition-all duration-150 hover:bg-white/[0.04] active:scale-[0.98]"
           >
             <ArrowLeft size={18} />
@@ -214,6 +215,25 @@ export default function TrackDetailScreen() {
           </div>
         </Card>
 
+        <Card className="p-5 mb-5 border border-gold/10">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-2xl border border-gold/20 bg-gold-muted text-gold">
+              <Sparkles size={16} />
+            </div>
+
+            <div className="min-w-0">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-text-muted mb-2">
+                Why this matters
+              </div>
+
+              <p className="text-sm leading-relaxed text-text-secondary">
+                Daily Call is the main event. This practice path gives you lower-pressure
+                reps so your read gets sharper before it counts.
+              </p>
+            </div>
+          </div>
+        </Card>
+
         <Card className="p-5 mb-5">
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -241,12 +261,12 @@ export default function TrackDetailScreen() {
 
         <Card className="p-5 mb-5">
           <div className="text-[11px] uppercase tracking-[0.18em] text-text-muted mb-2">
-            Live Path Stats
+            Path Stats
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-sm text-text-secondary">Linked Reps</div>
+              <div className="text-sm text-text-secondary">Live Reps</div>
               <div className="text-2xl font-bold text-text-primary mt-1">
                 {realChallengeCount}
               </div>
@@ -254,7 +274,9 @@ export default function TrackDetailScreen() {
 
             <div>
               <div className="text-sm text-text-secondary">Reward</div>
-              <div className="text-2xl font-bold text-gold mt-1">+15</div>
+              <div className="text-2xl font-bold text-gold mt-1">
+                +{PRACTICE_REWARD_EP}
+              </div>
             </div>
           </div>
         </Card>
@@ -286,23 +308,10 @@ export default function TrackDetailScreen() {
         </div>
 
         <div className="mt-5">
-          <Card className="p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Flame size={14} className="text-orange-400" />
-              <div className="text-[11px] uppercase tracking-[0.18em] text-text-muted">
-                Next Upgrade
-              </div>
-            </div>
-
-            <p className="text-sm text-text-secondary leading-relaxed">
-              This path is now connected to your real challenge bank, so each
-              session trains on actual market-reaction reps instead of placeholder prompts.
-            </p>
-          </Card>
-        </div>
-
-        <div className="mt-5">
-          <Button fullWidth onClick={() => navigate(`/practice/${track.id}`)}>
+          <Button
+            fullWidth
+            onClick={() => navigate(`/practice/${track.id}/session`)}
+          >
             Start Practice
             <ChevronRight size={16} className="ml-2" />
           </Button>

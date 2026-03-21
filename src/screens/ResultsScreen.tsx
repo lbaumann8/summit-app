@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Sparkles, Trophy } from 'lucide-react';
+import { Lock, Sparkles, Trophy, BookOpen } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { dailyChallenge } from '../data/dailyChallenge';
@@ -12,6 +12,11 @@ import {
 } from '../data/rankEngine';
 import { getNearMissText } from '../data/nearMissEngine';
 import { getProfile, updateProfile } from '../lib/profile';
+import {
+  recordTrackPerformance,
+  addRecentActivity,
+  type PerformanceMap,
+} from '../lib/performance';
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -134,6 +139,31 @@ function getResultSubtext(
   return 'Today was a miss, but this is where the learning gets valuable.';
 }
 
+function getRecommendedPracticeTrackId(todayResult: {
+  weightedScore: number;
+  allHighConfidenceCorrect: boolean;
+} | null): keyof PerformanceMap {
+  if (!todayResult) return 'macro';
+
+  if (todayResult.allHighConfidenceCorrect) return 'earnings';
+  if (todayResult.weightedScore <= 1) return 'macro';
+  if (todayResult.weightedScore <= 2) return 'risk';
+  return 'momentum';
+}
+
+function getRecommendationCopy(trackId: keyof PerformanceMap) {
+  if (trackId === 'macro') {
+    return 'Macro reactions are the best next place to sharpen your read.';
+  }
+  if (trackId === 'earnings') {
+    return 'Earnings expectation gaps are the best next place to build edge.';
+  }
+  if (trackId === 'momentum') {
+    return 'Momentum and follow-through reads are the best next place to improve.';
+  }
+  return 'Risk-event scenarios are the best next place to sharpen your judgment.';
+}
+
 function animateValue(
   start: number,
   end: number,
@@ -163,9 +193,23 @@ type SavedAnswer = {
   confidence?: 'low' | 'medium' | 'high';
 };
 
+type Direction = 'up' | 'down';
+type AssetKey = 'sp500' | 'qqq' | 'techStock' | 'airlines' | 'singleStock';
+
+function getOutcomeMap(challenge: typeof dailyChallenge) {
+  return challenge.outcome as Partial<Record<AssetKey, Direction>>;
+}
+
+function getExplanationMap(challenge: typeof dailyChallenge) {
+  return challenge.explanations as Partial<Record<AssetKey, string>>;
+}
+
 export default function ResultsScreen() {
   const navigate = useNavigate();
   const challenge = dailyChallenge;
+
+  const outcomeMap = getOutcomeMap(challenge);
+const explanationMap = getExplanationMap(challenge);
 
   const devMode = localStorage.getItem('devMode') === 'true';
   const unlockTime = Number(localStorage.getItem('unlockTime') || '0');
@@ -210,14 +254,14 @@ export default function ResultsScreen() {
 
   const correctCount = useMemo(() => {
     return challenge.assets.filter((asset) => {
-      return answers[asset.key]?.direction === challenge.outcome[asset.key];
+      return answers[asset.key]?.direction === outcomeMap[asset.key as AssetKey];
     }).length;
   }, [answers, challenge]);
 
   const weightedScore = useMemo(() => {
     return challenge.assets.reduce((sum, asset) => {
       const answer = answers[asset.key];
-      const isCorrect = answer?.direction === challenge.outcome[asset.key];
+      const isCorrect = answer?.direction === outcomeMap[asset.key as AssetKey];
 
       if (!isCorrect) return sum;
 
@@ -229,7 +273,7 @@ export default function ResultsScreen() {
     return challenge.assets.every((asset) => {
       const a = answers[asset.key];
       return (
-        a?.direction === challenge.outcome[asset.key] &&
+        a?.direction === outcomeMap[asset.key as AssetKey] &&
         a?.confidence === 'high'
       );
     });
@@ -246,7 +290,7 @@ export default function ResultsScreen() {
   const primaryAsset = challenge.assets[0];
   const primaryUserAnswer = primaryAsset ? answers[primaryAsset.key] : undefined;
   const primaryCorrectAnswer = primaryAsset
-    ? challenge.outcome[primaryAsset.key]
+    ? outcomeMap[primaryAsset.key as AssetKey]
     : undefined;
   const primaryIsCorrect =
     primaryUserAnswer?.direction === primaryCorrectAnswer;
@@ -267,6 +311,20 @@ export default function ResultsScreen() {
   const primaryVerdictLabel = getVerdictLabel(
     primaryIsCorrect,
     primaryUserAnswer?.confidence
+  );
+
+  const recommendedPracticeTrackId = useMemo(
+    () =>
+      getRecommendedPracticeTrackId({
+        weightedScore,
+        allHighConfidenceCorrect,
+      }),
+    [weightedScore, allHighConfidenceCorrect]
+  );
+
+  const recommendationCopy = useMemo(
+    () => getRecommendationCopy(recommendedPracticeTrackId),
+    [recommendedPracticeTrackId]
   );
 
   const [computedRewardState, setComputedRewardState] = useState<{
@@ -304,7 +362,7 @@ export default function ResultsScreen() {
       const projectedTotalEdgePoints = currentTotalEdgePoints + edgePointsEarned;
       const newRank = getMockRankFromEdgePoints(projectedTotalEdgePoints);
       const movement = getRankMovement(previousRank, newRank);
-      const passedText = getPlayerPassed(previousRank, newRank);
+      const passedText = getPlayerPassed(previousRank, newRank) ?? '';
 
       if (mounted) {
         setComputedRewardState({
@@ -437,9 +495,26 @@ export default function ResultsScreen() {
 
       if (!alreadyAwardedToday) {
         localStorage.setItem('totalEdgePoints', String(nextTotalEdgePoints));
+
+        recordTrackPerformance(
+          recommendedPracticeTrackId,
+          1,
+          weightedScore >= 2 ? 1 : 0
+        );
+
+        addRecentActivity({
+          type: 'daily_call',
+          title: `Daily Call: ${resultHeadline}`,
+          subtitle: `${weightedScore}/${maxScore} score, +${edgePointsEarned} EP`,
+          createdAt: Date.now(),
+        });
       }
 
       localStorage.setItem('lastRank', String(newRank));
+      localStorage.setItem(
+        'recommendedPracticeTrack',
+        recommendedPracticeTrackId
+      );
 
       await updateProfile({
         total_edge_points: nextTotalEdgePoints,
@@ -471,6 +546,7 @@ export default function ResultsScreen() {
     movement,
     passedText,
     resultHeadline,
+    recommendedPracticeTrackId,
   ]);
 
   if (timeLeft > 0) {
@@ -488,7 +564,7 @@ export default function ResultsScreen() {
             </h1>
 
             <p className="mb-2 text-sm text-text-secondary">
-              Your daily call is locked in.
+              Your Daily Call is locked in.
             </p>
 
             <p className="mb-6 text-sm text-text-muted">
@@ -716,8 +792,9 @@ export default function ResultsScreen() {
 
           <p className="text-sm leading-relaxed text-text-secondary">
             {primaryAsset
-              ? challenge.explanations[primaryAsset.key]
-              : 'The market reaction depended on how traders interpreted the setup.'}
+  ? explanationMap[primaryAsset.key as AssetKey] ??
+    'The market reaction depended on how traders interpreted the setup.'
+  : 'The market reaction depended on how traders interpreted the setup.'}
           </p>
         </Card>
 
@@ -730,9 +807,9 @@ export default function ResultsScreen() {
             const userAnswer = answers[asset.key];
             const userDirection = userAnswer?.direction;
             const userConfidence = userAnswer?.confidence;
-            const correctAnswer = challenge.outcome[asset.key];
+            const correctAnswer = outcomeMap[asset.key as AssetKey];
             const isCorrect = userDirection === correctAnswer;
-            const explanation = challenge.explanations[asset.key];
+            const explanation = explanationMap[asset.key as AssetKey];
             const earned = isCorrect ? getConfidencePoints(userConfidence) : 0;
 
             return (
@@ -799,22 +876,27 @@ export default function ResultsScreen() {
               What next
             </div>
 
-            <p className="mb-4 text-sm leading-relaxed text-text-secondary">
-              Daily results are the main scorecard. Use training mode to sharpen
-              pattern recognition before tomorrow’s call.
+            <p className="mb-2 text-sm leading-relaxed text-text-secondary">
+              Daily results are the main scorecard. Use Practice to sharpen your
+              read before tomorrow’s Daily Call.
+            </p>
+
+            <p className="mb-4 text-sm leading-relaxed text-text-muted">
+              {recommendationCopy}
             </p>
 
             <div className="flex flex-col gap-3">
-              <Button fullWidth onClick={() => navigate('/challenge/daily')}>
-                See Today’s Challenge
+              <Button fullWidth onClick={() => navigate('/home')}>
+                Back Home
               </Button>
 
               <Button
                 fullWidth
                 variant="secondary"
-                onClick={() => navigate('/tracks')}
+                onClick={() => navigate(`/practice/${recommendedPracticeTrackId}`)}
               >
-                Go to Training Mode
+                <BookOpen size={16} className="mr-2" />
+                Recommended Practice
               </Button>
             </div>
           </Card>

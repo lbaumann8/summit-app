@@ -6,16 +6,19 @@ import {
   Sparkles,
   ChevronRight,
   Settings,
+  BookOpen,
 } from 'lucide-react';
 import TopBar from '../components/layout/TopBar';
 import BottomNav from '../components/layout/BottomNav';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
-import { getProfile, type Profile } from '../lib/profile';
+import { getProfile } from '../lib/profile';
 
 const RANK_LADDER = ['Rise', 'Ascent', 'Ridge', 'Peak', 'Summit'] as const;
 const RANK_THRESHOLDS = [0, 100, 250, 500, 1000];
+
+type ProfileData = Awaited<ReturnType<typeof getProfile>>;
 
 function getRankData(totalEdgePoints: number) {
   let currentRankIndex = 0;
@@ -62,7 +65,7 @@ function getStreakMultiplier(streak: number) {
 
 export default function ProfileScreen() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileData>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   useEffect(() => {
@@ -119,7 +122,8 @@ export default function ProfileScreen() {
           </h1>
 
           <p className="mt-2 max-w-[92%] text-sm leading-relaxed text-text-secondary">
-            Track your progress, protect your streak, and climb the rank ladder.
+            Track your rank, protect your streak, and see how your Daily Call work
+            is compounding over time.
           </p>
         </div>
 
@@ -271,6 +275,30 @@ export default function ProfileScreen() {
 
         <Card
           className="mb-4 cursor-pointer p-5 transition-transform active:scale-[0.995]"
+          onClick={() => navigate('/practice')}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02] text-text-secondary">
+                <BookOpen size={16} />
+              </div>
+
+              <div>
+                <div className="text-sm font-semibold text-text-primary">
+                  Keep Building Your Edge
+                </div>
+                <div className="mt-1 text-sm text-text-secondary">
+                  Go to Practice and stack more reps before tomorrow’s Daily Call
+                </div>
+              </div>
+            </div>
+
+            <ChevronRight size={16} className="flex-shrink-0 text-text-muted" />
+          </div>
+        </Card>
+
+        <Card
+          className="mb-4 cursor-pointer p-5 transition-transform active:scale-[0.995]"
           onClick={() => navigate('/settings')}
         >
           <div className="flex items-center justify-between gap-4">
@@ -309,12 +337,12 @@ export default function ProfileScreen() {
 
         <Card className="p-5">
           <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            Coming Soon
+            What’s Next
           </div>
 
           <p className="text-sm leading-relaxed text-text-secondary">
-            Profile history, accuracy trends, confidence calibration, and streak
-            analytics will live here.
+            This profile will expand to include Daily Call history, accuracy
+            trends, confidence calibration, and longer-term progress over time.
           </p>
         </Card>
       </main>

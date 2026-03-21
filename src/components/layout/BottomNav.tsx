@@ -1,4 +1,4 @@
-import { Home, Zap, LayoutGrid, Trophy, User } from 'lucide-react';
+import { Home, BookOpen, Trophy, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -6,19 +6,13 @@ const navItems = [
     icon: Home,
     label: 'Home',
     path: '/home',
-    matches: ['/home'],
+    matches: ['/home', '/challenge/daily', '/results'],
   },
   {
-    icon: Zap,
-    label: 'Challenges',
-    path: '/challenges',
-    matches: ['/challenges', '/challenge/daily', '/results'],
-  },
-  {
-    icon: LayoutGrid,
-    label: 'Tracks',
-    path: '/tracks',
-    matches: ['/tracks', '/practice/'],
+    icon: BookOpen,
+    label: 'Practice',
+    path: '/practice',
+    matches: ['/practice', '/tracks/'],
   },
   {
     icon: Trophy,

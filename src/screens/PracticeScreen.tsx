@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CheckCircle2,
-  Sparkles,
   ChevronRight,
   BookOpen,
   XCircle,
@@ -15,6 +14,10 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { tracks, challenges } from '../data/challenges';
 import { updateProfile } from '../lib/profile';
+import {
+  recordTrackPerformance,
+  type PerformanceMap,
+} from '../lib/performance';
 
 const RANK_LADDER = ['Rise', 'Ascent', 'Ridge', 'Peak', 'Summit'] as const;
 const RANK_THRESHOLDS = [0, 100, 250, 500, 1000];
@@ -100,19 +103,6 @@ export default function PracticeScreen() {
 
   const track = tracks.find((item) => item.id === trackId);
 
-  const practiceChallenges = useMemo(() => {
-    if (!track) return [];
-    return challenges.filter((challenge) => challenge.track === track.name);
-  }, [track]);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  const [completedCount, setCompletedCount] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [sessionFinished, setSessionFinished] = useState(false);
-  const [rewardGranted, setRewardGranted] = useState(false);
-
   if (!track) {
     return (
       <div className="app-shell flex min-h-screen flex-col text-white">
@@ -138,6 +128,20 @@ export default function PracticeScreen() {
       </div>
     );
   }
+
+  const activeTrack = track;
+
+  const practiceChallenges = challenges.filter(
+    (challenge) => challenge.track === activeTrack.name
+  );
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [sessionFinished, setSessionFinished] = useState(false);
+  const [rewardGranted, setRewardGranted] = useState(false);
 
   if (practiceChallenges.length === 0) {
     return (
@@ -208,7 +212,7 @@ export default function PracticeScreen() {
 
   function grantPracticeRewardOncePerDay() {
     const todayKey = getTodayKey();
-    const rewardStorageKey = `practiceRewarded:${track.id}:${todayKey}`;
+    const rewardStorageKey = `practiceRewarded:${activeTrack.id}:${todayKey}`;
     const alreadyRewardedToday =
       localStorage.getItem(rewardStorageKey) === 'true';
 
@@ -237,8 +241,29 @@ export default function PracticeScreen() {
 
     if (isLastChallenge) {
       const didGrantReward = grantPracticeRewardOncePerDay();
-      incrementCompletedPracticeCount(track.id, practiceChallenges.length);
-      setPracticeCompletionToast(track.name, didGrantReward);
+
+      recordTrackPerformance(
+        activeTrack.id as keyof PerformanceMap,
+        practiceChallenges.length,
+        nextCorrectCount
+      );
+
+      localStorage.setItem(
+        'recentActivity',
+        JSON.stringify([
+          {
+            id: `practice-${Date.now()}`,
+            type: 'practice',
+            title: `${activeTrack.name} practice completed`,
+            subtitle: `${nextCorrectCount}/${practiceChallenges.length} correct`,
+            createdAt: Date.now(),
+          },
+          ...JSON.parse(localStorage.getItem('recentActivity') || '[]'),
+        ].slice(0, 10))
+      );
+
+      incrementCompletedPracticeCount(activeTrack.id, practiceChallenges.length);
+      setPracticeCompletionToast(activeTrack.name, didGrantReward);
 
       if (didGrantReward) {
         try {
@@ -284,7 +309,7 @@ export default function PracticeScreen() {
           <button
             type="button"
             onClick={() =>
-              navigate(sessionFinished ? '/tracks' : `/tracks/${track.id}`)
+              navigate(sessionFinished ? '/tracks' : `/tracks/${activeTrack.id}`)
             }
             aria-label="Back"
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02] text-text-primary transition-all duration-150 hover:bg-white/[0.04] active:scale-[0.98]"
@@ -304,7 +329,7 @@ export default function PracticeScreen() {
           </div>
 
           <h1 className="text-[30px] font-bold leading-[1.05] text-text-primary">
-            {track.name}
+            {activeTrack.name}
           </h1>
 
           <p className="mt-2 max-w-[92%] text-sm leading-relaxed text-text-secondary">
@@ -412,7 +437,7 @@ export default function PracticeScreen() {
                   className="h-full rounded-full transition-all duration-300"
                   style={{
                     width: `${((currentIndex + 1) / practiceChallenges.length) * 100}%`,
-                    backgroundColor: track.color,
+                    backgroundColor: activeTrack.color,
                   }}
                 />
               </div>

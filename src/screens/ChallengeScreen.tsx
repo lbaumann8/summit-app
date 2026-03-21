@@ -135,7 +135,7 @@ export default function ChallengeScreen() {
 
   if (alreadyPlayed) {
     return (
-      <div className="app-shell flex flex-col min-h-screen text-white">
+      <div className="app-shell relative flex min-h-screen flex-col text-white">
         <header className="px-4 pt-4">
           <div className="rounded-[28px] border border-white/[0.06] bg-[rgba(10,13,24,0.96)] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.01)_inset]">
             <div className="flex items-center justify-between gap-3">
@@ -158,22 +158,28 @@ export default function ChallengeScreen() {
         </header>
 
         <main className="flex flex-1 items-center justify-center px-4 py-6 text-center">
-          <Card className="w-full max-w-md p-6">
+          <Card className="w-full max-w-md p-6 border border-gold/10">
             <div className="mb-3 inline-flex items-center rounded-full border border-gold/20 bg-gold-muted px-3 py-1 text-[11px] font-semibold tracking-wide text-gold">
               Locked In
             </div>
 
             <h2 className="mb-2 text-xl font-bold text-text-primary">
-              You’ve already made today’s call
+              You already made today’s call
             </h2>
 
             <p className="mx-auto mb-6 max-w-xs text-sm leading-relaxed text-text-secondary">
-              Your prediction is saved. Come back later to see how you did.
+              Your Daily Call is saved. Come back later to see how your read held up.
             </p>
 
-            <Button fullWidth onClick={() => navigate('/results')}>
-              View Results
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button fullWidth onClick={() => navigate('/results')}>
+                View Results
+              </Button>
+
+              <Button fullWidth variant="secondary" onClick={() => navigate('/home')}>
+                Back Home
+              </Button>
+            </div>
           </Card>
         </main>
       </div>
@@ -181,7 +187,7 @@ export default function ChallengeScreen() {
   }
 
   return (
-    <div className="app-shell flex flex-col min-h-screen text-white relative">
+    <div className="app-shell relative flex min-h-screen flex-col text-white">
       <header className="px-4 pt-4">
         <div className="rounded-[28px] border border-gold/10 bg-[linear-gradient(180deg,rgba(18,24,26,0.96)_0%,rgba(10,13,24,0.98)_100%)] px-4 py-3 shadow-[0_0_0_1px_rgba(132,186,146,0.04)_inset]">
           <div className="flex items-center justify-between gap-3">
@@ -230,7 +236,9 @@ export default function ChallengeScreen() {
             </div>
 
             <div className="text-2xl font-bold text-yellow-400">
-              {showLockedState ? 'Locked' : `0:${secondsLeft.toString().padStart(2, '0')}`}
+              {showLockedState
+                ? 'Locked'
+                : `0:${secondsLeft.toString().padStart(2, '0')}`}
             </div>
           </Card>
 

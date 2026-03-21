@@ -1,0 +1,22 @@
+{
+  "name": "Summit",
+  "short_name": "Summit",
+  "description": "Finance judgment training with Daily Calls and Practice Paths.",
+  "theme_color": "#07070A",
+  "background_color": "#07070A",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
